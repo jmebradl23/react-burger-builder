@@ -1,6 +1,6 @@
 import React from 'react';
-
 import Aux from '../../hoc/Aux';
+import Toolbar from '../Navigation/Toolbar/Toolbar';
 
 import classes from './Layout.css'; 
 
@@ -8,8 +8,10 @@ import classes from './Layout.css';
 // div will hold the navigational components: Toolbar, SideDrawer and Backdrop
 // main will hold the burger builder and will output the component we wrap with this layout
 // Since we have adjacent JSX elements, we need to wrap it in a higher order component wrapper (Aux)
+// Since we want the Toolbar on every page we load, we will put it on the Layout component.
 const layout = (props) => (
 	<Aux>
+		<Toolbar />
 		<div>Toolbar, SideDrawer, Backdrop</div>
 		{
 		// Adding a class (ass className) to the main component to use styling definded in Layout.css in the .Content class
