@@ -1,7 +1,7 @@
 //This is a container beacause it is a stateful component, and therefore we will be manipulating the state.
 import React, { Component } from 'react';
 import Burger from '../../components/Burger/Burger';
-import Aux from '../../hoc/Aux';
+import Aux from '../../hoc/Aux/Aux';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
@@ -11,17 +11,19 @@ const INGREDIENT_PRICES = {
 	lettuce: 0.5,
 	cheese: 0.5,
 	meat: 1.75,
-	bacon: 1.25
+	bacon: 1.25,
+	onion: 0.75
 };
 
 class BurgerBuilder extends Component {
 	// Setting up state to hold all ingredients for a burger
 	state = {
 		ingredients: {
+			lettuce: 0,
 			bacon: 0,
 			cheese: 0,
-			lettuce: 0,
-			meat: 0
+			meat: 0, 
+			onion: 0
 		},
 		// Var to hold price of burger
 		totalPrice: 4,

@@ -1,6 +1,12 @@
 import React from 'react';
-import Aux from '../../../hoc/Aux';
+import Aux from '../../../hoc/Aux/Aux';
 import Button from '../../UI/Button/Button';
+
+/* To check when this component updates, it was changed into a class so that the componentWillUpdate() method can be used:
+componentWillUpdate() {
+	console.log('Will Update inside orderSummary');
+} 
+We can see that this updates whenever the hamburger is changed and not only when the modal is called*/
 
 const orderSummary = (props) => {
 	const ingredientSummary = Object.keys(props.ingredients)

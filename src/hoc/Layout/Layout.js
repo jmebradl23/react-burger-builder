@@ -1,7 +1,9 @@
+// Moving Layout into hoc folder as it is a wrapper component
+
 import React, {Component} from 'react';
-import Aux from '../../hoc/Aux';
-import Toolbar from '../Navigation/Toolbar/Toolbar';
-import SideDrawer from '../Navigation/SideDrawer/SideDrawer';
+import Aux from '../Aux/Aux';
+import Toolbar from '../../components/Navigation/Toolbar/Toolbar';
+import SideDrawer from '../../components/Navigation/SideDrawer/SideDrawer';
 
 import classes from './Layout.css'; 
 
@@ -31,7 +33,7 @@ class Layout extends Component {
 					open={this.state.showSideDrawer} 
 					closed={this.sideDrawerClosedHandler} />
 				{
-				// Adding a class (ass className) to the main component to use styling definded in Layout.css in the .Content class
+				// Adding a class (as className) to the main component to use styling definded in Layout.css in the .Content class
 				}
 				<main className={classes.Content}>
 					{this.props.children}
