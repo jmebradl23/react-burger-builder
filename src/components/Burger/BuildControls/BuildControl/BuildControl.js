@@ -9,7 +9,11 @@ const buildControl = (props) => (
 	//Passing the props.added for the ingredientAdded method call from BuildControls component as an onClick method
 	// Adding disabled prop which will be set in BuildControls.js
 	<div className={classes.BuildControl}>
-		<button className={classes.Less} onClick={props.removed} disabled={props.disabled}>-1</button>
+		<button 
+			className={classes.Less}
+			onClick={props.removed} 
+			disabled={props.disabled}>-1
+		</button>
 		<div className={classes.Label}>{props.label}</div>
 		<button className={classes.More} onClick={props.added}>+1</button>
 		

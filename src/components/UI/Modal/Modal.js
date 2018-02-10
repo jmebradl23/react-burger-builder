@@ -9,7 +9,8 @@ class Modal extends Component {
 	// Adding shouldComponentUpdate check:
 	shouldComponentUpdate(nextProps, nextState) {
 		// using the .show method to determine if component should update
-		return nextProps.show !== this.props.show;
+		// updating this so that the spinner will show if we make a post request (using children)
+		return nextProps.show !== this.props.show || nextProps.children !== this.props.children;
 	}
 	componentWillUpdate () {
 		console.log('Will Update triggered in Modal');
@@ -17,7 +18,7 @@ class Modal extends Component {
 	render () {
 		return (
 			<Aux>
-				<Backdrop close={this.props.closeModal} show={this.props.show}/>
+				<Backdrop show={this.props.show} closeModal={this.props.close}/>
 				<div className={classes.Modal}
 					style={{
 						transform: this.props.show ? 'translateY(0)':'translateY(-100vh)', 

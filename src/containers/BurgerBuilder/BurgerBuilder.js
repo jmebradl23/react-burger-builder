@@ -5,6 +5,10 @@ import Aux from '../../hoc/Aux/Aux';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
+import Spinner from '../../components/UI/Spinner/Spinner';
+//Wrapping this component with the error handler
+import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
+import axios from '../../axios-orders';
 
 // Creating a global var to keep track of additional ingredient prices
 const INGREDIENT_PRICES = {
@@ -18,17 +22,25 @@ const INGREDIENT_PRICES = {
 class BurgerBuilder extends Component {
 	// Setting up state to hold all ingredients for a burger
 	state = {
-		ingredients: {
-			lettuce: 0,
-			bacon: 0,
-			cheese: 0,
-			meat: 0, 
-			onion: 0
-		},
+		ingredients: null,
 		// Var to hold price of burger
 		totalPrice: 4,
 		canOrder : false,
-		reviewOrder: false
+		reviewOrder: false,
+		loading: false,
+		error: false
+	}
+
+	componentDidMount () {
+		console.log('fetching ingredients');
+		axios.get('https://react-burger-builder-a77c9.firebaseio.com/orders/ingredients.json')
+			.then(response => {
+				console.log(this.state.ingredients)
+				this.setState({ingredients: response.data});
+			})
+			.catch( error => {
+                this.setState( { error: true } );
+            } );
 	}
 
 	updateCanOrderState (ingredients) {
@@ -40,7 +52,7 @@ class BurgerBuilder extends Component {
 			.reduce((sum, el) => {
 				return sum + el;
 			},0);
-		this.setState({canOrder: sum>0})
+		this.setState({canOrder: sum>0});
 	}
 
 	// Adding methods to remove and add ingredients which both will receive the type of ingredient:
@@ -94,7 +106,31 @@ class BurgerBuilder extends Component {
 	}
 
 	purchaseContinueHandler = () => {
-		alert('You will continue');
+		// Using Firebase for post request.
+		this.setState({loading: true});
+		// Getting our data from state
+		const data = {
+			ingredients: this.state.ingredients,
+			price: this.state.totalPrice,
+			customer: {
+				name: 'James Bradley',
+				address: {
+					street: '123 Sesame Street',
+					zipCode: '12345',
+					country: 'United States'
+				},
+				email: 'test@test.com',
+			},
+			deliveryMethod: 'super fast'
+		}
+		// Creating an end point, and passing our data with the post request
+		axios.post('/orders.json', data)
+			.then(response => {
+				this.setState({loading: false, reviewOrder: false});
+			})
+			.catch(error => {
+				this.setState({loading: false, reviewOrder: false});
+			});
 	}
 
 	// implementing a lifestyle method to tell react what to render , and returning JSX of two adjacent components (hence we wrap it in a fragment): the burger, and the burger build controls
@@ -107,34 +143,45 @@ class BurgerBuilder extends Component {
 		for (let key in disabledInfo) {
 			disabledInfo[key] = disabledInfo[key] <=0
 		}
-		return (
-			<Aux>
-				<Modal show={this.state.reviewOrder} closeModal={this.orderReviewCancelHandler}>
-					<OrderSummary 
-						purchaseCancel={this.orderReviewCancelHandler}
-						purchaseContinue={this.purchaseContinueHandler}
-						ingredients={this.state.ingredients}
-						price={this.state.totalPrice.toFixed(2)}/>
-				</Modal>
-				{/* Replacing text with the <Burger/> module as a self closing tag.
-				<div>Burger</div> */}
-				<Burger ingredients={this.state.ingredients} />
-				{// Adding in the BuildControls component to overwrite text
-				// <div>Build Controls</div>
-				}
-				{/*Passing method handlers to BuildControls as a prop so it can be read down the chain.
-				Also passing disabledInfo object down the chain to check if ingredients are <0
-				Adding price as a prop to pass down the chain to BuildControls*/}
+		let orderSummary = null;
+		// creating a variable to change orderSummary depending on if there's a server delay in our post request
+
+		let burger = this.state.error ? <p>Ingredients can't be loaded!</p> : <Spinner />;
+		
+		if(this.state.ingredients) {
+			// Adding in the BuildControls component to overwrite text
+			// <div>Build Controls</div>
+			/*Passing method handlers to BuildControls as a prop so it can be read down the chain.
+			Also passing disabledInfo object down the chain to check if ingredients are <0
+			Adding price as a prop to pass down the chain to BuildControls*/
+			burger = (<Aux><Burger ingredients={this.state.ingredients} />
 				<BuildControls 
 					ingredientAdded={this.addIngredientHandler}
 					ingredientRemoved ={this.removeIngredientHandler} 
 					disabled ={disabledInfo}
 					price={this.state.totalPrice}
 					canOrder={this.state.canOrder}
-					reviewingOrder={this.reviewOrderHandler}/> 
+					reviewingOrder={this.reviewOrderHandler}/></Aux>);
+			orderSummary = <OrderSummary 
+						purchaseCancel={this.orderReviewCancelHandler}
+						purchaseContinue={this.purchaseContinueHandler}
+						ingredients={this.state.ingredients}
+						price={this.state.totalPrice.toFixed(2)}/>;
+			if (this.state.loading) {
+				orderSummary = <Spinner/>;
+			}
+		}
+
+		return (
+			<Aux>
+				<Modal show={this.state.reviewOrder} closeModal={this.orderReviewCancelHandler}>
+				{orderSummary}
+				</Modal>
+				{burger}
 			</Aux>
 		);
 	}
 }
 
-export default BurgerBuilder;
+// wrapping this component with errorHandler
+export default withErrorHandler(BurgerBuilder, axios);
