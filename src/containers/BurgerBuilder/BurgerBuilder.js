@@ -32,7 +32,7 @@ class BurgerBuilder extends Component {
 	}
 
 	componentDidMount () {
-		console.log('fetching ingredients');
+		console.log(this.props);
 		axios.get('https://react-burger-builder-a77c9.firebaseio.com/orders/ingredients.json')
 			.then(response => {
 				console.log(this.state.ingredients)
@@ -107,31 +107,43 @@ class BurgerBuilder extends Component {
 
 	purchaseContinueHandler = () => {
 		// Using Firebase for post request.
-		this.setState({loading: true});
+		// this.setState({loading: true});
 		// Getting our data from state
-		const data = {
-			ingredients: this.state.ingredients,
-			price: this.state.totalPrice,
-			customer: {
-				name: 'James Bradley',
-				address: {
-					street: '123 Sesame Street',
-					zipCode: '12345',
-					country: 'United States'
-				},
-				email: 'test@test.com',
-			},
-			deliveryMethod: 'super fast'
-		}
+		// const data = {
+		// 	ingredients: this.state.ingredients,
+		// 	price: this.state.totalPrice,
+		// 	customer: {
+		// 		name: 'James Bradley',
+		// 		address: {
+		// 			street: '123 Sesame Street',
+		// 			zipCode: '12345',
+		// 			country: 'United States'
+		// 		},
+		// 		email: 'test@test.com',
+		// 	},
+		// 	deliveryMethod: 'super fast'
+		// }
 		// Creating an end point, and passing our data with the post request
-		axios.post('/orders.json', data)
-			.then(response => {
-				this.setState({loading: false, reviewOrder: false});
-			})
-			.catch(error => {
-				this.setState({loading: false, reviewOrder: false});
-			});
-	}
+		// axios.post('/orders.json', data)
+		// 	.then(response => {
+		// 		this.setState({loading: false, reviewOrder: false});
+		// 	})
+		// 	.catch(error => {
+		// 		this.setState({loading: false, reviewOrder: false});
+		// 	});
+		const queryParams = [];
+		for (let i in this.state.ingredients) {
+			queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]));
+		}
+		queryParams.push('price=' + this.state.totalPrice);
+		const queryString = queryParams.join('&');
+
+		this.props.history.push({
+			pathname: '/checkout',
+			search: '?' + queryString
+		})
+	};
+
 
 	// implementing a lifestyle method to tell react what to render , and returning JSX of two adjacent components (hence we wrap it in a fragment): the burger, and the burger build controls
 	render () {
